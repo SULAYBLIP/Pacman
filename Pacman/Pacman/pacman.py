@@ -28,6 +28,60 @@ def wallCheck(x,y,mask):
     else:                                                                                                                                                                                           #the picture
         return mask.get_at((x-mazedistx,y-mazedisty))[ :3] != WALL                                                                                      #then for color of mask
     #userinput
+def valid(maze, moves):
+    for x, pos in enumerate(maze[0]):
+        if pos == "S":
+            start = x
+
+    i = start
+    j = 0
+    for move in moves:
+        if move == "L":
+            i -= 1
+
+        elif move == "R":
+            i += 1
+
+        elif move == "U":
+            j -= 1
+
+        elif move == "D":
+            j += 1 
+
+        if not(0 <= i < len(maze[0]) and 0 <= j < len(maze)):
+            return False
+        elif (maze[j][i] == 1):
+            return False
+
+    return True
+
+
+def findEnd(maze, moves):
+    for x, pos in enumerate(maze[0]):
+        if pos == "S":
+            start = x
+
+    i = start
+    j = 0
+    for move in moves:
+        if move == "L":
+            i -= 1
+
+        elif move == "R":   
+            i += 1
+
+        elif move == "U":
+            j -= 1
+
+        elif move == "D":
+            j += 1
+
+    if maze[j][i] == "F":
+        print("Found: " + moves)
+        #printMaze(maze, moves)
+        return True
+
+    return False
 
 def movePick(pacman, playerspeed):
     'move player'                                                                                                    
@@ -85,173 +139,6 @@ def nxtMove (pacman):
         pacman[MOVE] = right
     if pacman[NXTMOVE] == left and wallCheck(pacman[X]-playerspeed, pacman[Y]+pacrad, mazemask) and (pacman[X]-mazedistx) %30 == 0 and (pacman[Y]-mazedisty) %30 == 0:
         pacman[MOVE] = left
-def findJumps(path):
-    nojumplist = []
-    for spot in range(len(path)-1):
-        if spot >= 1:
-            x1 = path[spot][0]
-            y1 = path[spot][1]
-            x2 = path[spot-1][0]
-            y2 = path[spot-1][1]
-            
-            nojumplist.append(path[spot])
-                
-            if abs (y1-y2) > 1 or abs(x1-x2) > 1 or abs (y1-y2) ==1 and abs(x1-x2) == 1:
-                #print('jt')
-                current = path[spot]
-                jumpindex = spot-1
-                counter = 0
-                while abs(current[0]-path[jumpindex][0]) >1 or abs(current[1]-path[jumpindex][1]) >1 or (current[0]-path[jumpindex][0]) == 1 and abs(current[1]-path[jumpindex][1]) == 1:
-#                    if jumpindex <= len(nojumplist):
-                    counter += 1
-                    if counter > 0:
-                        #print(nojumplist[jumpindex])
-                        del nojumplist[jumpindex]
-                        jumpindex -= 1
-                        spot -= 1
-                    print (spot, len(nojumplist))
-
-                del nojumplist[spot-1]
-                nojumplist.insert(spot,current)
-                
-
-    #print(path, nojumplist)
-
-    return nojumplist   
-                
-        
-def listTranslate (directions):
-    newdirections = []
-    for node in range (len(directions) -1):
-        x1 = directions[node][0]
-        y1 = directions[node][1]
-        x2 = directions[node+1][0]
-        y2 = directions[node+1][1]
-        if y1 - y2 == 1:
-            newdirections.append('U')
-        if y1 - y2 == -1:
-            newdirections.append('D')
-        if x1 - x2 == 1:
-            newdirections.append('L')
-        if x1 - x2 == -1:
-            newdirections.append('R')
-    return newdirections
-def removeDuplicates(yourList):
-    final = []
-    for e in yourList:
-        if e not in final:
-            final.append(e)
-    return final
-
-def getTarget(ghosts, ghost, pacman):
-    'gets target based on ghost, and pacman loacation'
-    newpacman = ((335-65)//30,(605-35)//30)
-    #newpacman = ((pacman[X]-65)//30,(pacman[Y]-35)//30)
-    newghost = ((ghosts[ghost][X]-65)//30,(ghosts[ghost][Y]-35)//30)
-    print(newpacman,newghost)
-            
-    return (newpacman[0], newpacman[1], newghost[0],newghost[0])
-
-def findNeighbours(node):
-    x = node[0]
-    y = node[1]
-    neighbours = []
-    if x > 0 and x < len(mazeList[y]):
-        if mazeList[y][x+1] != 1:
-            neighbours.append((x+1,y))
-        if mazeList[y][x-1] != 1:
-            neighbours.append((x-1,y))
-    if y > 0 and y < len(mazeList):
-        if mazeList[y+1][x] != 1:
-            neighbours.append((x,y+1))
-        if mazeList[y-1][x] != 1:
-            neighbours.append((x,y-1))
-    return neighbours
-               
-def Gethcost(node,endx,endy):                                   #F cost = G + H
-    'calculates distance of node from end'
-    x = node[0]
-    y = node[1]
-    hCost = abs(x-endx)+abs(y-endy)                         #G cost = distance from start
-    return hCost                                            #H cost = distance from end
-                                                
-def findpath(endx,endy,startx,starty):
-    'finds path'
-    mazeList =[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                     [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
-                     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                     [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
-                     [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                     [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],     #2d list representation of maze
-                     [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1],     #used to check if player is in contact with wall
-                     [1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1],     #if 1 its a wall and you can't go there
-                     [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1],      #middle
-                     [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
-                     [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1],
-                     [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],     #0 is open spot
-                     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                     [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
-                     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-                     [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-                     [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                     [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-                     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]] 
-    currentx, currenty = startx,starty
-    openlist = [[],     #node
-                [],     #fcost
-                [],     #hcost
-                [],     #gcost
-                []]     #parent
-    closedlist = []
-    openlist[node].append((currentx,currenty))
-    openlist[gcosti].append(0)
-    openlist[hcosti].append(Gethcost((currentx,currenty), endx,endy))
-    openlist[fcosti].append(openlist[gcosti][0] + openlist[hcosti][0])
-    currentnode = [0, 0, 0, 0]
-    currentnode[node] = (currentx,currenty)
-    currentnode[gcosti] = 0
-    currentnode[hcosti] = Gethcost(currentnode[node],endx,endy)
-    currentnode[fcosti] = currentnode[gcosti] + currentnode[hcosti]
-    count = 0
-    curnodelist = []
-    while len(openlist) > 0:
-        count += 1
-        curnodelist.append (currentnode[node])
-        neighbours = findNeighbours(currentnode[node])
-        #print(openlist[parent])
-        for neighbour in neighbours:                                         #generating new neighbours for open list
-            if closedlist.count(neighbour) > 0:
-                continue
-            newneighbourcost = currentnode[gcosti] + 1        #adding 1 to get gcost   
-            if openlist[node].count(neighbour) == 0:
-                gcost = newneighbourcost                                 #getting new costs
-                hcost = Gethcost(neighbour,endx,endy)
-                fcost = gcost+hcost
-                if openlist[node].count(neighbour) == 0:    
-                    openlist[node].append(neighbour)
-                    openlist[gcosti].append(gcost)
-                    openlist[hcosti].append(hcost)
-                    openlist[fcosti].append(fcost)
-                    openlist[parent].append (currentnode[node])               #adding neigbours to open list
-        for i in range (len(openlist[node])):                               #looping through open
-            if openlist[fcosti][i] < currentnode[fcosti] or openlist[fcosti][i] == currentnode[fcosti] and openlist[hcosti][i] < currentnode[hcosti]:
-                current = openlist[node][i]
-                currentnode[node] = current                                  #making current node node at index if it is closer to the end              
-        if len(openlist[node]) > 1:
-            closedlist.append(currentnode[node])                                #adding to closed
-            currenti = openlist[node].index(currentnode[node])
-            for i in range (len(openlist)-1):                                     #removing from open
-                del openlist[i][currenti]
-                    
-
-        if currentnode[node] == (endx,endy):                                  
-            openlist[parent].append(currentnode[node])
-            duplicatesrem = removeDuplicates(openlist[parent])
-            jumpsfound = findJumps(duplicatesrem)
-            translated = listTranslate(jumpsfound)
-            return translated            
 
 def moveGhost(ghosts, ghostspeed): #ghosts = [350,320,(randint(0,3)]
     'moves ghosts randomly'
@@ -260,7 +147,6 @@ def moveGhost(ghosts, ghostspeed): #ghosts = [350,320,(randint(0,3)]
     dirchoice = [0,1,2,3]
     #moves indices for pacman list
     for ghost in range(len(ghosts)):
-        
         distX = abs(ghosts[ghost][X]-startX)
         distY = abs(ghosts[ghost][Y]-startY)
         if ghosts[ghost][MOVE] == right and wallCheck(ghosts[ghost][X]+pacrad+ghostspeed,ghosts[ghost][Y], ghostmask):
@@ -271,7 +157,6 @@ def moveGhost(ghosts, ghostspeed): #ghosts = [350,320,(randint(0,3)]
             ghosts[ghost][Y] -= ghostspeed
         elif ghosts[ghost][MOVE] == down and wallCheck(ghosts[ghost][X],ghosts[ghost][Y]+pacrad+ghostspeed, ghostmask):
             ghosts[ghost][Y] += ghostspeed
-            
         if ghosts [ghost][MOVE] == right:
             if wallCheck(ghosts[ghost][X]+pacrad+ghostspeed,ghosts[ghost][Y],ghostmask) and (ghosts[ghost][X]-80) %30 == 0 and (ghosts[ghost][Y]-50) %30 == 0 and distX >= 120 or wallCheck(ghosts[ghost][X]+pacrad+ghostspeed,ghosts[ghost][Y],ghostmask) == False:
                 dirchoice.remove(2)
@@ -299,7 +184,6 @@ def moveGhost(ghosts, ghostspeed): #ghosts = [350,320,(randint(0,3)]
                 startY = ghosts[ghost][Y]
         #dirchoice.remove(ghosts[ghost][MOVE])
         dirchoice = [0,1,2,3]
-        
 
     
 def ghosthit(ghosts,pacman):
@@ -523,6 +407,10 @@ def levels():
     'the screen which appears and lets you change between levels'
 
     draw.rect(screen,(0,0,0),(0,0,800,700))
+
+    draw.rect(screen,WHITE,(homeRect))
+    HOMP = transform.scale(home,(50,50))
+    screen.blit(HOMP,(10,10))
     
     draw.rect(screen,(255,204,0),(playRect))
     LVL1 = customfont.render("LEVEL 1",True,(WHITE))
@@ -738,8 +626,8 @@ mazeList =[[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                      [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
                      [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],     #2d list representation of maze
                      [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1],     #used to check if player is in contact with wall
-                     [1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1],     #if 1 its a wall and you can't go there
-                     [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1],      #middle
+                     [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],     #if 1 its a wall and you can't go there
+                     [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],      #middle
                      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
                      [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1],
                      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],     #0 is open spot
@@ -788,12 +676,6 @@ NXTMOVE = 4
 LIVES = 5
 pacman = [335,605, 2, 0, 0, 3]
 livespic = image.load('pacmanpic.png')
-# A* variables
-node = 0
-fcosti = 1
-hcosti = 2
-gcosti = 3
-parent = 4
 #ghost columns
 ghostframes = []                                #appending 2dlist of frames
 ghostframes.append(makeMove('bluedude',1,4))    #blue
@@ -847,15 +729,25 @@ coinList2 = [[0]*19 for i in range(21)]
 for i in range (len(coinList)):
     for j in range(len(coinList[i])):
         coinList2[i][j] = listConvert(j,i)
-##target = getTarget(ghosts, 0, pacman)
-print(findpath(9,18,16,18))
+
         
 while running():
-    
+
 
     mb=mouse.get_pressed()
     mx,my=mouse.get_pos()
     keys=key.get_pressed()
+    
+    if mb[0] == 1:
+        MouseC = 1
+    if keys[K_RIGHT]:
+        statusR = 1
+        
+    if keys[K_LEFT]:
+        statusL = 1
+
+
+
     if (keys[K_LSHIFT] or keys[K_RSHIFT]) and (keys[K_h] or keys[K_m]):
         Screen = "menu"
     
@@ -868,13 +760,7 @@ while running():
     if Screen == "menu":
         menu()
 
-        if mb[0] == 1:
-            MouseC = 1
-        if keys[K_RIGHT]:
-            statusR = 1
-            
-        if keys[K_LEFT]:
-            statusL = 1
+ 
             
         if select == "play":
             draw.rect(screen,WHITE,(playRect),5)
@@ -924,15 +810,19 @@ while running():
                 select = "settings"
                            
         if mb[0] == 1 and playRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "play"
-        if mb[0] == 0 and levelsRect.collidepoint(mx,my) and MouseC == 1:
+        if mb[0] == False and levelsRect.collidepoint(mx,my) and MouseC == 1:
             MouseC = 0
             Screen = "levels"
         if mb[0] == 1 and settingsRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "settings"
         if mb[0] == 1 and customRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "custom"
         if mb[0] == 1 and instructionRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "instruction"
 
         if select == "play" and keys[K_RETURN]:
@@ -946,7 +836,7 @@ while running():
         if select == "instructions" and keys[K_RETURN]:
             Screen = "instructions"
             
-    elif Screen == "play":
+    elif Screen == "play":            
         movePick(pacman,playerspeed)
         movePacman(pacman,playerspeed)
         nxtMove(pacman)
@@ -1088,7 +978,75 @@ while running():
              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
     elif Screen == "level3":
-        print('hello')
+        pacman[LIVES] = 1
+        movePick(pacman,playerspeed)
+        movePacman(pacman,playerspeed)
+        nxtMove(pacman)
+        moveGhost(ghosts, ghostspeed)
+        checkCoinhits(pacman,coinList,coinList2)
+        if ghosthit(ghosts,pacman):
+            pacman[LIVES] -= 1
+            pacman[X],pacman[Y] = 335,605 
+            for g in range (len(ghosts)):
+                ghosts[g][X],ghosts[g][Y] = ox,oy
+              
+        drawScene(maze,mazewidth,mazeheight, ghosts)
+        COINCOUNTER = str(CoinCounter)
+        COINS = mainfont.render(COINCOUNTER,True,(GOLD))
+        screen.blit(COINS,(640,500))
+        draw.rect(screen,WHITE,(homeRect))
+        screen.blit(HOMP,(10,10))
+        if mb[0] == 1 and homeRect.collidepoint(mx,my):
+            Screen = "menu"
+        if empty(coinList) == True:
+            Screen = "Winning2"
+            pacman[LIVES] = 1
+            coinList = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+             [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+             [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
+             [0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+             [0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+             [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        if pacman[LIVES] == 0:
+            Screen = "Losing2"
+            pacman[LIVES] = 1
+            coinList = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+             [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+             [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
+             [0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+             [0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+             [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+             [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
     
     elif Screen == "instruction":
         instruction()
@@ -1199,6 +1157,9 @@ while running():
 
     elif Screen == "levels":
         levels()
+        if mb[0] == 1 and homeRect.collidepoint(mx,my):
+            Screen = "menu"
+        
         if mb[0] == 1 and playRect.collidepoint(mx,my):
             Screen = "play"
         if mb[0] == 1 and levelsRect.collidepoint(mx,my):
@@ -1238,31 +1199,41 @@ while running():
     elif Screen == "Winning2":
         Winning1()
         if mb[0] == 1 and WplayARect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "level2"
             pacman[0] = 335
             pacman[1] = 605
         if mb[0] == 1 and WplayNRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "level3"
             pacman[0] = 335
             pacman[1] = 605
         if mb[0] == 1 and WmenuRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "menu"
 
     elif Screen == "Winning3":
         Winning2()
+        if mb[0] == 1 and LplayRect.collidepoint(mx,my):
+            MouseC = 0
+            Screen = "level3"
+        if mb[0] == 1 and LmenuRect.collidepoint(mx,my):
+            MouseC = 0
+            Screen = "menu"
 
     elif Screen == "Losing3":
         Losing()
         if mb[0] == 1 and LplayRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "level3"
             pacman[0] = 335
             pacman[1] = 605
         if mb[0] == 1 and LmenuRect.collidepoint(mx,my):
+            MouseC = 0
             Screen = "menu"
 
 
     display.flip()
-    
 quit()
 
 

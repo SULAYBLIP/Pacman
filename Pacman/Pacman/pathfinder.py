@@ -7,7 +7,7 @@ mazeList =          [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                      [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
                      [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
                      [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],     #2d list representation of maze
-                     [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 'S', 1, 1, 1, 1],     #used to check if player is in contact with wall
+                     [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1],     #used to check if player is in contact with wall
                      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],     #if 1 its a wall and you can't go there
                      [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],      #middle
                      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
@@ -17,7 +17,7 @@ mazeList =          [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                      [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
                      [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
                      [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-                     [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                     [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 'S', 0, 1],
                      [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
                      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]] 
@@ -46,16 +46,16 @@ def findJumps(path):
                 while abs(current[0]-path[jumpindex][0]) >1 or abs(current[1]-path[jumpindex][1]) >1 or (current[0]-path[jumpindex][0]) == 1 and abs(current[1]-path[jumpindex][1]) == 1:
 #                    if jumpindex <= len(nojumplist):
                     counter += 1
-##                    if counter > 0:
-                    #print(nojumplist[jumpindex])
-                    del nojumplist[jumpindex]
-                    jumpindex -= 1
-                    spot -= 1
+                    if counter > 0:
+                        #print(nojumplist[jumpindex])
+                        del nojumplist[jumpindex]
+                        jumpindex -= 1
+                        spot -= 1
                     print (spot, len(nojumplist))
 
-                
-                nojumplist.insert(spot,current)
                 del nojumplist[spot-1]
+                nojumplist.insert(spot,current)
+                
 
     return nojumplist   
                 
@@ -170,9 +170,7 @@ def findpath(mazeList,endx,endy,startx,starty):
         for i in range (len(openlist[node])):                               #looping through open
             if openlist[fcosti][i] < currentnode[fcosti] or openlist[fcosti][i] == currentnode[fcosti] and openlist[hcosti][i] < currentnode[hcosti]:
                 current = openlist[node][i]
-                currentnode[node] = current
-                for j in range (len(openlist)):
-                    openlist[j].pop(i)                                                            #making current node node at index if it is closer to the end              
+                currentnode[node] = current                                  #making current node node at index if it is closer to the end              
         if len(openlist[node]) > 1:
             closedlist.append(currentnode[node])                                #adding to closed
             currenti = openlist[node].index(currentnode[node])
@@ -180,7 +178,7 @@ def findpath(mazeList,endx,endy,startx,starty):
             #pprint (openlist)
             #print(currentnode[node])
             for i in range (len(openlist)-1):                                     #removing from open
-                openlist[i].pop(currenti)
+                del openlist[i][currenti]
                     
 
         if currentnode[node] == (endx,endy):                                  
